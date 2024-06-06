@@ -12,7 +12,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class ContaService {
-
     private Set<Conta> contas = new HashSet<>();
     private ConnectionFactory connectionFactory;
 
@@ -21,7 +20,9 @@ public class ContaService {
     }
 
     public Set<Conta> listarContasAbertas() {
-        return contas;
+        Connection connection = connectionFactory.recuperarConexao();
+        ContaDAO contaDAO = new ContaDAO(connection);
+        return contaDAO.listar();
     }
 
     public BigDecimal consultarSaldo(Integer numeroDaConta) {
@@ -29,36 +30,10 @@ public class ContaService {
         return conta.getSaldo();
     }
 
-    public void abrir(DadosAberturaConta dadosDaConta) {
-        var cliente = new Cliente(dadosDaConta.dadosCliente());
-        var conta = new Conta(dadosDaConta.numero(), cliente);
-
-        if (contas.contains(conta)) {
-            throw new RegraDeNegocioException("Já existe outra conta aberta com o mesmo número!");
-        }
-
-        String sql = "INSERT INTO conta(numero, saldo, cliente_nome, cliente_cpf, cliente_email) " +
-                "VALUES (?, ?, ?, ?, ?)";
-
-        try (Connection connect = connectionFactory.recuperarConexao();
-             PreparedStatement ps = connect.prepareStatement(sql)) {
-
-            ps.setInt(1, conta.getNumero());
-            ps.setBigDecimal(2, BigDecimal.ZERO);
-            ps.setString(3, cliente.getNome());
-            ps.setString(4, cliente.getCpf());
-            ps.setString(5, cliente.getEmail());
-
-            int resultado = ps.executeUpdate();
-            if (resultado == 1) {
-                System.out.println("Dados inseridos com sucesso e conta aberta.");
-                contas.add(conta);
-            } else {
-                System.out.println("Erro ao abrir conta.");
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+    public boolean abrir(DadosAberturaConta dadosDaConta) {
+        Connection connection = connectionFactory.recuperarConexao();
+        ContaDAO contaDAO = new ContaDAO(connection);
+        return contaDAO.salvar(dadosDaConta);
     }
 
     public void realizarSaque(Integer numeroDaConta, BigDecimal valor) {
@@ -89,7 +64,7 @@ public class ContaService {
             throw new RegraDeNegocioException("Conta não pode ser encerrada pois ainda possui saldo!");
         }
 
-        contas.remove(conta);
+        //contas.remove(conta);
     }
 
     private Conta buscarContaPorNumero(Integer numero) {
