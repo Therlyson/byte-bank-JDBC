@@ -83,7 +83,8 @@ public class BytebankApplication {
         System.out.println("Digite o email do cliente:");
         var email = teclado.next();
 
-        service.abrir(new DadosAberturaConta(numeroDaConta, new DadosCadastroCliente(nome, cpf, email)));
+        DadosAberturaConta conta = new DadosAberturaConta(numeroDaConta, new DadosCadastroCliente(nome, cpf, email));
+        service.abrir(conta);
 
         System.out.println("Conta aberta com sucesso!");
         System.out.println("Pressione qualquer tecla e de ENTER para voltar ao menu principal");
