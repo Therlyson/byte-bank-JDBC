@@ -6,7 +6,6 @@ import java.math.BigDecimal;
 import java.util.Objects;
 
 public class Conta {
-
     private Integer numero;
     private BigDecimal saldo;
     private Cliente titular;
@@ -15,6 +14,12 @@ public class Conta {
         this.numero = numero;
         this.titular = titular;
         this.saldo = BigDecimal.ZERO;
+    }
+
+    public Conta(Integer numero, BigDecimal saldo, Cliente titular) {
+        this.numero = numero;
+        this.titular = titular;
+        this.saldo = saldo;
     }
 
     public boolean possuiSaldo() {

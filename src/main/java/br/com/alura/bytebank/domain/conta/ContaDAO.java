@@ -33,6 +33,7 @@ public class ContaDAO {
             ps.setString(5, cliente.getEmail());
 
             int resultado = ps.executeUpdate();
+            connection.close();
             return resultado == 1;
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -58,9 +59,56 @@ public class ContaDAO {
                 Conta conta = new Conta(numeroConta, cliente);
                 contas.add(conta);
             }
+            result.close();
+            ps.close();
+            connection.close();
         }catch (SQLException e){
             throw new RuntimeException(e);
         }
         return contas;
+    }
+
+    public Conta listarPorNumero(Integer num){
+        String sql = "SELECT * FROM conta WHERE numero=?";
+
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, num);
+            ResultSet result = ps.executeQuery();
+
+            while (result.next()){
+                Integer numeroConta = result.getInt(1);
+                BigDecimal saldo = result.getBigDecimal(2);
+                String nome = result.getString(3);
+                String cpf = result.getString(4);
+                String email = result.getString(5);
+
+                Cliente cliente = new Cliente(new DadosCadastroCliente(nome, cpf, email));
+                Conta conta = new Conta(numeroConta, saldo, cliente);
+                return conta;
+            }
+
+            result.close();
+            ps.close();
+            connection.close();
+        }catch (SQLException e){
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
+
+    public Boolean atualizar(Conta conta){
+        String sql = "UPDATE conta SET saldo = ? WHERE numero = ?";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setBigDecimal(1, conta.getSaldo());
+            ps.setInt(2, conta.getNumero());
+
+            int resultado = ps.executeUpdate();
+            connection.close();
+            return resultado == 1;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

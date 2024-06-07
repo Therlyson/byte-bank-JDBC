@@ -38,7 +38,7 @@ public class BytebankApplication {
                 }
             } catch (RegraDeNegocioException e) {
                 System.out.println("Erro: " +e.getMessage());
-                System.out.println("Pressione qualquer tecla e de ENTER para voltar ao menu");
+                System.out.println("\nPressione qualquer tecla e de ENTER para voltar ao menu");
                 teclado.next();
             }
             opcao = exibirMenu();
@@ -107,12 +107,13 @@ public class BytebankApplication {
     }
 
     private static void consultarSaldo() {
-        System.out.println("Digite o número da conta:");
+        System.out.print("Digite o número da conta: ");
         var numeroDaConta = teclado.nextInt();
         var saldo = service.consultarSaldo(numeroDaConta);
-        System.out.println("Saldo da conta: " +saldo);
+        System.out.println("Saldo da conta de número "+ numeroDaConta
+            + ": " + saldo + "R$");
 
-        System.out.println("Pressione qualquer tecla e de ENTER para voltar ao menu principal");
+        System.out.println("\nPressione qualquer tecla e de ENTER para voltar ao menu principal");
         teclado.next();
     }
 
@@ -136,9 +137,13 @@ public class BytebankApplication {
         System.out.println("Digite o valor do depósito:");
         var valor = teclado.nextBigDecimal();
 
-        service.realizarDeposito(numeroDaConta, valor);
+        boolean deposito = service.realizarDeposito(numeroDaConta, valor);
+        if(deposito){
+            System.out.println("Depósito realizado com sucesso!");
+        }else{
+            System.out.println("Erro ao realizar depósito!");
+        }
 
-        System.out.println("Depósito realizado com sucesso!");
         System.out.println("Pressione qualquer tecla e de ENTER para voltar ao menu principal");
         teclado.next();
     }
