@@ -9,17 +9,24 @@ public class Conta {
     private Integer numero;
     private BigDecimal saldo;
     private Cliente titular;
+    private Boolean estaAtiva;
 
-    public Conta(Integer numero, Cliente titular) {
+    public Conta(Integer numero, Cliente titular, Boolean estaAtiva) { //construtor para quando ser criado uma conta pela primeira vez
         this.numero = numero;
         this.titular = titular;
         this.saldo = BigDecimal.ZERO;
+        this.estaAtiva = estaAtiva;
     }
 
-    public Conta(Integer numero, BigDecimal saldo, Cliente titular) {
+    public Conta(Integer numero, BigDecimal saldo, Cliente titular, Boolean estaAtiva) {
         this.numero = numero;
         this.titular = titular;
         this.saldo = saldo;
+        this.estaAtiva = estaAtiva;
+    }
+
+    public Boolean getEstaAtiva() {
+        return estaAtiva;
     }
 
     public boolean possuiSaldo() {
@@ -49,11 +56,10 @@ public class Conta {
 
     @Override
     public String toString() {
-        return "Conta{" +
-                "numero='" + numero + '\'' +
-                ", saldo=" + saldo +
-                ", titular=" + titular +
-                '}';
+        return "Número da conta: " + numero +
+                ", Titular: " + titular +
+                ", Saldo: " + saldo +
+                ", ativa: " + estaAtiva;
     }
 
     public Integer getNumero() {

@@ -51,6 +51,10 @@ public class ContaService {
             throw new RegraDeNegocioException("Saldo insuficiente!");
         }
 
+        if(!conta.getEstaAtiva()){
+            throw new RegraDeNegocioException("Erro ao tentar sacar de uma conta que não está ativa no momento.");
+        }
+
         conta.sacar(valor);
         Connection connection = connectionFactory.recuperarConexao();
         ContaDAO contaDAO = new ContaDAO(connection);
@@ -63,18 +67,43 @@ public class ContaService {
             throw new RegraDeNegocioException("Valor do deposito deve ser superior a zero!");
         }
 
+        if(!conta.getEstaAtiva()){
+            throw new RegraDeNegocioException("Erro ao tentar depositar de uma conta que não está ativa no momento.");
+        }
+
         conta.depositar(valor);
         Connection connection = connectionFactory.recuperarConexao();
         ContaDAO contaDAO = new ContaDAO(connection);
         return contaDAO.atualizar(conta);
     }
 
-    public void encerrar(Integer numeroDaConta) {
+    public boolean realizarTransferencia(Integer numeroContaOrigem, Integer numeroContaDestino, BigDecimal valor){
+        boolean saque = this.realizarSaque(numeroContaOrigem, valor);
+        boolean deposito = this.realizarDeposito(numeroContaDestino, valor);
+        if(saque && deposito){
+            return true;
+        }else{
+            throw new RegraDeNegocioException("Erro ao realizar transferência!!");
+        }
+    }
+
+    public Boolean encerrarConta(Integer numeroConta){
+        var conta = buscarContaPorNumero(numeroConta);
+        if (conta.possuiSaldo()) {
+            throw new RegraDeNegocioException("Conta não pode ser encerrada pois ainda possui saldo!");
+        }
+        Connection connection = connectionFactory.recuperarConexao();
+        ContaDAO contaDAO = new ContaDAO(connection);
+        return contaDAO.desativarConta(conta);
+    }
+
+    public Boolean encerrarContaDoBanco(Integer numeroDaConta) {
         var conta = buscarContaPorNumero(numeroDaConta);
         if (conta.possuiSaldo()) {
             throw new RegraDeNegocioException("Conta não pode ser encerrada pois ainda possui saldo!");
         }
-
-        //contas.remove(conta);
+        Connection connection = connectionFactory.recuperarConexao();
+        ContaDAO contaDAO = new ContaDAO(connection);
+        return contaDAO.encerrarDoBanco(numeroDaConta);
     }
 }
